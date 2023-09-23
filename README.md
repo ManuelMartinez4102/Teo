@@ -6,7 +6,7 @@
 #4 Receptor:
 #5 Destino de información.
 
-1 la fuente de información será un paquete de mensajes de conversaciones, esos mensajes serán guardados en un Excel para mayor comodidad y facilidad al acomodar.
+1 la fuente de información será un paquete de mensajes de conversaciones, esos mensajes serán guardados en una cadena para mayor comodidad y facilidad al acomodar.
 
 2 los mensajes los va a codificar a un sistema de bits.
 
