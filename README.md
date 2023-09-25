@@ -17,3 +17,7 @@
 4 se Decodificaran los mensajes que se pasara de binario a palabras con funciones. 
 
 5 El destino seria la persona a la que le llegan los mensajes.
+
+
+
+
