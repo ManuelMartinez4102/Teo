@@ -3,12 +3,47 @@ import pickle
 import math
 import matplotlib.pyplot as plt
 from collections import Counter
+import heapq
+from collections import defaultdict
 
+
+def calcular_frecuencias(cadena):
+    frecuencias = defaultdict(int)
+    for numero in cadena:
+        frecuencias[numero] += 1
+    return frecuencias
+
+def construir_arbol_huffman(frecuencias):
+    heap = [[frecuencia, [numero, ""]] for numero, frecuencia in frecuencias.items()]
+    heapq.heapify(heap)
+
+    while len(heap) > 1:
+        lo = heapq.heappop(heap)
+        hi = heapq.heappop(heap)
+        for par in lo[1:]:
+            par[1] = '0' + par[1]
+        for par in hi[1:]:
+            par[1] = '1' + par[1]
+        heapq.heappush(heap, [lo[0] + hi[0]] + lo[1:] + hi[1:])
+
+    return sorted(heapq.heappop(heap)[1:], key=lambda p: (len(p[-1]), p))
+
+def codificar_huffman(cadena):
+    frecuencias = calcular_frecuencias(cadena)
+    arbol_huffman = construir_arbol_huffman(frecuencias)
+
+    codigos = {}
+    for numero, codigo in arbol_huffman:
+        codigos[numero] = codigo
+
+    cadena_codificada = ''.join([codigos[numero] for numero in cadena])
+
+    return cadena_codificada, codigos
 
 
 def recopilar_mensajes():
   # Simulacion de un mensaje mandado de un usuario
-  mensajes = ["Hola", "bien", "vale", "okay", "weeeee", "veeeee"]
+  mensajes = ["Holaaaaaaa", "bieneeeeee", "valeeeeeeee", "okaaay", "weeeee", "veeeee"]
   mensaje = random.choice(mensajes)
   mensajes_recopilados = {
       "mensaje": mensaje
@@ -20,8 +55,26 @@ def recopilar_mensajes():
 
 def transmicion_de_mensaje(mensajes_recopilados):
     mensaje_codificado = ''.join(format(ord(c), '08b') for c in mensajes_recopilados["mensaje"])
+    print("mensaje en binario")
+    print(mensaje_codificado)
+
+    bytes_binarios = [mensaje_codificado[i:i+8] for i in range(0, len(mensaje_codificado), 8)]
+    cadena_ascii = ""
+
+
+    for byte in bytes_binarios:
+      valor_decimal = int(byte, 2)
+      #print(valor_decimal)
+
+      caracter_ascii = chr(valor_decimal)
+      cadena_ascii += caracter_ascii
+
+    cadena=cadena_ascii
+
+    cadena_codificada, codigos = codificar_huffman(cadena)
+    print("Tabla de códigos Huffman:", codigos)
     mensaje_transmitidos = {
-        "mensaje": mensaje_codificado
+        "mensaje": cadena_codificada
     }
     print( mensaje_transmitidos)
     return mensaje_transmitidos
@@ -40,7 +93,7 @@ def fibra_optica(mensaje_transmitidos):
 
     #meter los de la cosa de entropia
 
-    valores_random = [0,1, 2, 2, 3, 5, 7, 10, 15, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    valores_random = [0,1, 2, 2, 3, 5, 7, 10, 15, 3, 4, 5, 6, 1, 10, 3, 5, 0, 1, 19, 34, 12, 2, 3, 7, 15, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     #valores_random = [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     num_random = random.choice(valores_random)
     #donde puede caer
@@ -62,6 +115,7 @@ def fibra_optica(mensaje_transmitidos):
         for i in range(len(mensaje_codificado)):
             if random.random() < num_random:
                 mensaje_con_ruido["mensaje"] = mensaje_con_ruido["mensaje"][:i] + ('0' if mensaje_codificado[i] == '1' else '1') + mensaje_con_ruido["mensaje"][i+1:]
+               # break
             #else:
              # print("no entro al ruido")
     return tiempo, probabilidades, entropiaH, entropia, porcentaje_ruido , mensaje_con_ruido
@@ -77,15 +131,24 @@ def receptor(mensaje_con_ruido):
     bytes_binarios = [cadena_binaria[i:i+8] for i in range(0, len(cadena_binaria), 8)]
     cadena_ascii = ""
 
+
     for byte in bytes_binarios:
       valor_decimal = int(byte, 2)
-      print(valor_decimal)
+      #print(valor_decimal)
+
       caracter_ascii = chr(valor_decimal)
       cadena_ascii += caracter_ascii
 
     print(cadena_ascii)
+
+    #print("para chauman")
+    #tama= len(cadena_ascii)
+    #print(tama)
+    #print("par2")
+    #print("probabilidad de que salga :")
+
     datos_decodificados1 = {
-        
+
         "El mensaje final": cadena_ascii
     }
     return datos_decodificados1
